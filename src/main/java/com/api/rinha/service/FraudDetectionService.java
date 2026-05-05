@@ -23,14 +23,14 @@ public class FraudDetectionService {
         ObjectMapper mapper = new ObjectMapper();
 
         Map<String, Double> mccRisk;
-        try (InputStream is = getClass().getResourceAsStream("/resources/mcc_risk.json")) {
+        try (InputStream is = getClass().getResourceAsStream("/mcc_risk.json")) {
             mccRisk = mapper.readValue(is, new TypeReference<>() {});
         }
 
         this.vectorizer = new VectorizerService(mccRisk);
 
         List<ReferenceEntry> entries;
-        try (InputStream raw = getClass().getResourceAsStream("/resources/references.json.gz");
+        try (InputStream raw = getClass().getResourceAsStream("/references.json.gz");
              GZIPInputStream gz = new GZIPInputStream(raw)) {
             entries = mapper.readValue(gz, new TypeReference<>() {});
         }
