@@ -1,4 +1,4 @@
-package com.rinha.vector;
+package com.api.rinha.vector;
 
 import java.util.*;
 
