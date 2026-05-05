@@ -1,0 +1,9 @@
+/home/israel/code/rinha/src/main/java/com/api/rinha/model/TransactionRequest.java
+/home/israel/code/rinha/src/main/java/com/api/rinha/service/VectorizerService.java
+/home/israel/code/rinha/src/main/java/com/api/rinha/handler/ReadyHandler.java
+/home/israel/code/rinha/src/main/java/com/api/rinha/Main.java
+/home/israel/code/rinha/src/main/java/com/api/rinha/vector/ReferenceVector.java
+/home/israel/code/rinha/src/main/java/com/api/rinha/MainVerticle.java
+/home/israel/code/rinha/src/main/java/com/api/rinha/handler/FraudScoreHandler.java
+/home/israel/code/rinha/src/main/java/com/api/rinha/service/FraudDetectionService.java
+/home/israel/code/rinha/src/main/java/com/api/rinha/vector/VPTree.java
