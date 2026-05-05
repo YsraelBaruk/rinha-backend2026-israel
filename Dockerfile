@@ -17,9 +17,9 @@ WORKDIR /app
 
 COPY --from=builder /build/target/rinha-1.0.0-SNAPSHOT.jar app.jar
 
-COPY resources/references.json.gz  ./resources/
-COPY resources/mcc_risk.json       ./resources/
-COPY resources/normalization.json  ./resources/
+COPY src/main/resources/references.json.gz  ./resources/
+COPY src/main/resources/mcc_risk.json       ./resources/
+COPY src/main/resources/normalization.json  ./resources/
 
 EXPOSE 8080
 
