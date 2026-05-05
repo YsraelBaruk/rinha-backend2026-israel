@@ -15,7 +15,7 @@ FROM azul/zulu-openjdk:25-jre
 
 WORKDIR /app
 
-COPY --from=builder /build/target/rinha-1.0.0-SNAPSHOT.jar app.jar
+COPY --from=builder /build/target/rinha-1.0.0-SNAPSHOT-fat.jar app.jar
 
 COPY src/main/resources/references.json.gz  ./resources/
 COPY src/main/resources/mcc_risk.json       ./resources/
