@@ -40,10 +40,9 @@ public class MainVerticle extends AbstractVerticle {
         .listen(port)
         .onComplete(http -> {
           if (http.succeeded()) {
-            System.out.println("HTTP server started on port " + port);
+            System.out.println("Servidor na porta " + port);
             startPromise.complete();
           } else {
-            System.err.println("Erro ao iniciar servidor: " + http.cause().getMessage());
             startPromise.fail(http.cause());
           }
         });
