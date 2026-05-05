@@ -29,7 +29,7 @@ services:
   api2:
     image: israelbaruque/rinha-2026:latest
     environment:
-      - PORT=8081
+      - PORT=8080
     deploy:
       resources:
         limits:
