@@ -10,12 +10,10 @@ public class MainVerticle extends AbstractVerticle {
         int port = Integer.parseInt(
             System.getenv().getOrDefault("PORT", "8080")
         );
-
-        // Carrega dataset em thread worker (não bloqueia o event loop)
         vertx.executeBlocking(promise -> {
             try {
                 FraudDetectionService service = new FraudDetectionService();
-                service.loadDataset();   // carrega references.json.gz + índice
+                service.loadDataset(); 
                 promise.complete(service);
             } catch (Exception e) {
                 promise.fail(e);
@@ -28,19 +26,17 @@ public class MainVerticle extends AbstractVerticle {
 
             FraudDetectionService service = (FraudDetectionService) result.result();
 
-            // Configura rotas
             Router router = Router.router(vertx);
             router.route().handler(BodyHandler.create());
 
             router.get("/ready").handler(new ReadyHandler());
             router.post("/fraud-score").handler(new FraudScoreHandler(service));
 
-            // Inicia servidor
             vertx.createHttpServer()
                 .requestHandler(router)
                 .listen(port, http -> {
                     if (http.succeeded()) {
-                        System.out.println("🚀 Servidor na porta " + port);
+                        System.out.println("Servidor na porta " + port);
                         startPromise.complete();
                     } else {
                         startPromise.fail(http.cause());
