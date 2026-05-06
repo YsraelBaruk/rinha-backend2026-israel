@@ -12,40 +12,24 @@ services:
       resources:
         limits:
           cpus: "0.10"
-          memory: "15MB"
+          memory: "10MB"
 
   api1:
     image: israelbaruque/rinha-2026:latest
     environment:
       - PORT=8080
-      - VECTOR_SERVICE_URL=http://vector-service:8090
-    depends_on:
-      - vector-service
     deploy:
       resources:
         limits:
-          cpus: "0.20"
-          memory: "25MB"
+          cpus: "0.45"
+          memory: "170MB"
 
   api2:
     image: israelbaruque/rinha-2026:latest
     environment:
       - PORT=8080
-      - VECTOR_SERVICE_URL=http://vector-service:8090
-    depends_on:
-      - vector-service
     deploy:
       resources:
         limits:
-          cpus: "0.20"
-          memory: "25MB"
-
-  vector-service:
-    image: israelbaruque/rinha-2026-vector:latest
-    volumes:
-      - ./resources:/app/resources:ro
-    deploy:
-      resources:
-        limits:
-          cpus: "0.50"
-          memory: "285MB"
+          cpus: "0.45"
+          memory: "170MB"
