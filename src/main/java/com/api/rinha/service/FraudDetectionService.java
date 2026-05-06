@@ -1,20 +1,20 @@
 package com.api.rinha.service;
 
+import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.api.rinha.model.TransactionRequest;
 import com.api.rinha.vector.VPTree;
-import com.api.rinha.vector.ReferenceVector;
 
-import java.io.InputStream;
-import java.util.List;
+import java.io.*;
 import java.util.Map;
 import java.util.zip.GZIPInputStream;
 
 public class FraudDetectionService {
 
     private static final int K = 5;
-    private static final double THRESHOLD = 0.6;
+    private static final int DIMS = 14;
+    private static final int MAX_SIZE = 3_000_000;
 
     private VPTree vpTree;
     private VectorizerService vectorizer;
@@ -26,40 +26,50 @@ public class FraudDetectionService {
         try (InputStream is = getClass().getResourceAsStream("/mcc_risk.json")) {
             mccRisk = mapper.readValue(is, new TypeReference<>() {});
         }
-
         this.vectorizer = new VectorizerService(mccRisk);
 
-        List<ReferenceEntry> entries;
-        try (InputStream raw = getClass().getResourceAsStream("/references.json.gz");
-             GZIPInputStream gz = new GZIPInputStream(raw)) {
-            entries = mapper.readValue(gz, new TypeReference<>() {});
+        float[] vectors = new float[MAX_SIZE * DIMS];
+        byte[] labels = new byte[MAX_SIZE];
+        int size = 0;
+
+        try (
+            InputStream raw = getClass().getResourceAsStream("/references.json.gz");
+            GZIPInputStream gz = new GZIPInputStream(new BufferedInputStream(raw, 65536));
+            JsonParser parser = new JsonFactory().createParser(gz)
+        ) {
+            parser.nextToken();
+
+            while (parser.nextToken() == JsonToken.START_OBJECT) {
+                int base = size * DIMS;
+
+                while (parser.nextToken() != JsonToken.END_OBJECT) {
+                    String field = parser.getCurrentName();
+                    parser.nextToken();
+
+                    if ("vector".equals(field)) {
+                        for (int i = 0; i < DIMS; i++) {
+                            parser.nextToken();
+                            vectors[base + i] = parser.getFloatValue();
+                        }
+                        parser.nextToken();
+
+                    } else if ("label".equals(field)) {
+                        labels[size] = "fraud".equals(parser.getText())
+                            ? (byte) 1 : (byte) 0;
+                    } else {
+                        parser.skipChildren();
+                    }
+                }
+                size++;
+            }
         }
 
-        ReferenceVector[] vectors = new ReferenceVector[entries.size()];
-        for (int i = 0; i < entries.size(); i++) {
-            ReferenceEntry e = entries.get(i);
-            vectors[i] = new ReferenceVector(e.vector, "fraud".equals(e.label));
-        }
-
-        System.out.printf("Dataset carregado: %d vetores %n", vectors.length);
-
-        this.vpTree = new VPTree(vectors);
-        System.out.println("P-Tree construído");
+        System.out.printf("Dataset carregado: %d vetores %n", size);
+        this.vpTree = new VPTree(vectors, labels, size);
     }
 
     public double score(TransactionRequest req) {
-        double[] queryVector = vectorizer.vectorize(req);
-        List<ReferenceVector> neighbors = vpTree.knn(queryVector, K);
-
-        long fraudCount = neighbors.stream()
-            .filter(ReferenceVector::isFraud)
-            .count();
-
-        return (double) fraudCount / K;
-    }
-
-    public static class ReferenceEntry {
-        public double[] vector;
-        public String   label;
+        double[] query = vectorizer.vectorize(req);
+        return vpTree.knnScore(query, K);
     }
 }
