@@ -12,7 +12,7 @@ import java.util.zip.GZIPInputStream;
 
 public class FraudDetectionService {
 
-    private static final int K = 5;
+    private static final int K = 2_000;
     private static final int DIMS = 14;
     private static final int MAX_SIZE = 3_000_000;
 
