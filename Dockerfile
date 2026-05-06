@@ -11,15 +11,16 @@ FROM azul/zulu-openjdk:25-jre
 WORKDIR /app
 COPY --from=builder /build/target/rinha-1.0.0-SNAPSHOT-fat.jar app.jar
 
-
-COPY src/main/resources/mcc_risk.json      ./resources/
-COPY src/main/resources/normalization.json ./resources/
+# Dataset e arquivos de referência dentro da imagem
+COPY src/main/resources/references.json.gz  ./resources/
+COPY src/main/resources/mcc_risk.json       ./resources/
+COPY src/main/resources/normalization.json  ./resources/
 
 EXPOSE 8080
 
 ENTRYPOINT ["java", \
-  "-Xms24m", \
-  "-Xmx40m", \
+  "-Xms32m", \
+  "-Xmx130m", \
   "-XX:+UseSerialGC", \
   "-XX:MaxMetaspaceSize=24m", \
   "-XX:+TieredCompilation", \
